@@ -1,8 +1,8 @@
 from Game.Sudoku import *
 from Solvers.SimulatedAnnealing import *
-
+from Solvers.GeneticAlgorithm import *
 
 game= Sudoku()
-agent= SimAnn(game)
+agent= Gen(game)
 
 agent.solve()
