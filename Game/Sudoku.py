@@ -111,7 +111,8 @@ class Sudoku:
                 if event.type == pygame.KEYDOWN:
                     if(self.selected):
                         if('0'<event.unicode<='9'):
-                            self.grid[int(self.selected[0])][int(self.selected[1])]=int(event.unicode)
+                            # self.grid[int(self.selected[0])][int(self.selected[1])]=int(event.unicode)
+                            self.put_number(int(event.unicode),(int(self.selected[0]),int(self.selected[1])))
                     if(event.unicode==' '):
                         self.checkGame()
            
@@ -123,12 +124,60 @@ class Sudoku:
         #             if(col!=self.solved[rIdx][cIdx]):
         #                 self.incorrectCells.append([rIdx,cIdx])
         #                 self.mistakes+=1
-        self.checkRows()
-        self.checkCols()
-        self.checkSquares()
+        # self.checkRows()
+        # self.checkCols()
+        # self.checkSquares()
+        self.checkAllValid()
         if(len(self.incorrectCells)==0):
             self.finished=self.allGameOver()
         self.selected=None     
+
+    def valid(self, num, pos):
+        #for The Ai
+        if(not 0<num<10):
+            return False
+
+        #rows
+        for i in range(ROWS):
+            if(self.grid[pos[0]][i] == num and pos[1] !=i ):
+                print('same row')
+                return False
+        
+        #cols
+        for i in range(COLS):
+            if(self.grid[i][pos[1]] == num and pos[0] !=i):
+                print('same col')
+                return False
+        
+        #squares
+        box_r = pos[1] // 3
+        box_c = pos[0] // 3
+
+        for i in range(box_c * 3, box_c* 3 + 3):
+            for j in range(box_r*3, box_r*3+3):
+                if(self.grid[i][j]== num and (i,j)!=pos):
+                    print('same sqaure')
+                    return False
+        return True
+
+    def checkAllValid(self):
+        for i in range(ROWS):
+            for j in range(COLS):
+                if(self.grid[i][j]!=0 and [i,j] not in self.lockedCells):
+                    if(not self.valid(self.grid[i][j], (i,j) )):
+                        self.incorrectCells.append([i,j])
+                        self.mistakes+=1
+
+    def put_number(self,num,pos):
+        self.grid[pos[0]][pos[1]]= num
+        if(self.valid(num,pos)):
+            # print("valid")
+            return True
+        else:
+            # print("invalid")
+            self.mistakes+=1
+            self.incorrectCells.append(pos)
+            return False
 
     def checkRows(self):
         for rIdx,row in enumerate(self.grid):
