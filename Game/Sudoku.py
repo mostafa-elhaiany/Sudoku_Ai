@@ -98,6 +98,8 @@ class Sudoku:
             for event in pygame.event.get():
                 if event.type== pygame.QUIT:
                     self.running=False
+                    pygame.quit()
+                    sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     selected= self.handleMouse()
                     if(selected):

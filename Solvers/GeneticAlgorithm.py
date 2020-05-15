@@ -32,8 +32,6 @@ class Genome:
                     
         return new_board
 
-    
-
     def crossover(self, genome):
         new_board = copy.deepcopy(self.board)
 
