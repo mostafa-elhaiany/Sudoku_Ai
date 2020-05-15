@@ -2,7 +2,7 @@ import pygame, sys
 import random as rn
 import math
 import copy
-from settings import *
+from Game.settings import *
 
 
 def get_board(size=9,probability=5):
@@ -80,6 +80,11 @@ class Sudoku:
                 break
         pygame.quit()
         sys.exit()
+
+    def step(self):
+        self.events(self.state)
+        self.update(self.state)
+        self.draw(self.state)
 
     def handleMouse(self):
         x_in_grid= grid_pos[0] <self.mouse_pos[0]< grid_pos[2]+grid_pos[0]
@@ -166,6 +171,7 @@ class Sudoku:
             for cIdx,col in enumerate(row):
                 if(col==0):
                     return False
+        print('congrats you solved sudoku!!')
         return True
     
     def update(self,state):
@@ -241,4 +247,8 @@ class Sudoku:
 
             pygame.display.update()
 
-
+    def displayGrid(self):
+        for row in self.grid:
+            for col in row:
+                print(f"{col}, ",end='')
+            print()
