@@ -130,7 +130,9 @@ class Sudoku:
         self.checkAllValid()
         if(len(self.incorrectCells)==0):
             self.finished=self.allGameOver()
-        self.selected=None     
+            return self.finished
+        self.selected=None    
+        return False 
 
     def valid(self, num, pos):
         #for The Ai
