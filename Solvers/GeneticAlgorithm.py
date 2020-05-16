@@ -175,7 +175,6 @@ class Gen:
         #     print(self.genomes[i].fitness, end=" ")
         # print('\n===============')
    
-
     def checkDifferent(self):
         for i in range(1,self.num_best_genomes):
             if(self.best[i-1].board==self.best[i].board):

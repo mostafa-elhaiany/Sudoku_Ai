@@ -46,7 +46,6 @@ class BckTrck:
         self.sudoku.checkGame()
         print(self.sudoku.mistakes)
 
-
     def get_next_pos(self,row,col):
         print('getting next slots for ',row,col)
         for r in range(row,self.num_rows):

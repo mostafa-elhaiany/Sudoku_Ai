@@ -98,6 +98,7 @@ class QL:
                 epsilon-=epsilon_decay_value
         
         self.final_sol()
+  
     def final_sol(self):
         self.reset()
         for i in range(self.num_rows):

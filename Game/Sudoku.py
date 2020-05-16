@@ -4,7 +4,8 @@ import math
 import copy
 from Game.settings import *
 
-
+#this function creates a new solved board and then passes by each cell and has a probability of whether the cell will be 
+#removed or not
 def get_board(size=9,probability=5):
     base = int(math.sqrt(size))
     side  = size
@@ -64,12 +65,14 @@ class Sudoku:
 
         print("done loading, let's play!")
     
+    #after loading the board the existing cells are added into lockedCells to tell the player not to add values in that cell
     def load(self):
         for rIdx, row in enumerate(self.grid):
             for cIdx,col in enumerate(row):
                 if(col!=0):
                     self.lockedCells.append([rIdx,cIdx])
 
+    #main loop of the game
     def run(self):
         while self.running:
             self.events(self.state)
@@ -81,11 +84,13 @@ class Sudoku:
         pygame.quit()
         sys.exit()
 
+    #1 step of the game for the Ai
     def step(self):
         self.events(self.state)
         self.update(self.state)
         self.draw(self.state)
 
+    #handes where the mouse is and which cell it's clicking on
     def handleMouse(self):
         x_in_grid= grid_pos[0] <self.mouse_pos[0]< grid_pos[2]+grid_pos[0]
         y_in_grid= grid_pos[1] <self.mouse_pos[1]< grid_pos[3]+grid_pos[1]
@@ -93,6 +98,7 @@ class Sudoku:
             return ((self.mouse_pos[0]-grid_pos[0])//cell_size,(self.mouse_pos[1]-grid_pos[1])//cell_size)
         return False
 
+    #handles all kinds of ingame events
     def events(self,state):
         if(state=='playing'):
             for event in pygame.event.get():
@@ -111,22 +117,22 @@ class Sudoku:
                 if event.type == pygame.KEYDOWN:
                     if(self.selected):
                         if('0'<event.unicode<='9'):
-                            # self.grid[int(self.selected[0])][int(self.selected[1])]=int(event.unicode)
                             self.put_number(int(event.unicode),(int(self.selected[0]),int(self.selected[1])))
                     if(event.unicode==' '):
                         self.checkGame()
-           
+
+    #checks if the game is done
     def checkGame(self):
         self.incorrectCells=[]
+        
+        ##can use this to check if its the exact board as the given one, not recomended bc one board may have more than one solution
         # for rIdx,row in enumerate(self.grid):
         #     for cIdx,col in enumerate(row):
         #         if(col!=0):
         #             if(col!=self.solved[rIdx][cIdx]):
         #                 self.incorrectCells.append([rIdx,cIdx])
         #                 self.mistakes+=1
-        # self.checkRows()
-        # self.checkCols()
-        # self.checkSquares()
+
         self.checkAllValid()
         if(len(self.incorrectCells)==0):
             self.finished=self.allGameOver()
@@ -134,6 +140,7 @@ class Sudoku:
         self.selected=None    
         return False 
 
+    #checks if a number is valid in a given position (row,col)
     def valid(self, num, pos):
         #for The Ai
         if(not 0<num<10):
@@ -162,6 +169,7 @@ class Sudoku:
                     return False
         return True
 
+    #loops over the entire board making sure every number is valid in its position
     def checkAllValid(self):
         for i in range(ROWS):
             for j in range(COLS):
@@ -170,6 +178,7 @@ class Sudoku:
                         self.incorrectCells.append([i,j])
                         self.mistakes+=1
 
+    #puts a number inside a cell, also checks if valid for the Ai
     def put_number(self,num,pos):
         self.grid[pos[0]][pos[1]]= num
         if(self.valid(num,pos)):
@@ -181,44 +190,7 @@ class Sudoku:
             self.incorrectCells.append(pos)
             return False
 
-    def checkRows(self):
-        for rIdx,row in enumerate(self.grid):
-            possibles= [1,2,3,4,5,6,7,8,9]
-            for cIdx in range(ROWS):
-                if(self.grid[rIdx][cIdx] in possibles):
-                    possibles.remove(self.grid[rIdx][cIdx])
-                else:
-                    if([rIdx,cIdx] not in self.lockedCells and self.grid[rIdx][cIdx]!=0 ):
-                        self.incorrectCells.append([rIdx,cIdx])
-                        self.mistakes+=1
-
-    def checkCols(self):
-        for cIdx in range(COLS):
-            possibles= [1,2,3,4,5,6,7,8,9]
-            for rIdx,row in enumerate(self.grid):
-                if(self.grid[rIdx][cIdx] in possibles):
-                    possibles.remove(self.grid[rIdx][cIdx])
-                else:
-                    if([rIdx,cIdx] not in self.lockedCells and self.grid[rIdx][cIdx]!=0 ):
-                        self.incorrectCells.append([rIdx,cIdx])
-                        self.mistakes+=1
-    
-    def checkSquares(self):
-        for x in range(3):
-            for y in range(3):
-                possibles=[1,2,3,4,5,6,7,8,9]
-                for i in range(3):
-                    for j in range(3):
-                        row= x*3+i
-                        col= y*3+j
-                        val=self.grid[row][col]
-                        if val in possibles:
-                            possibles.remove(val)
-                        else:
-                            if([row,col] not in self.lockedCells and self.grid[row][col]!=0 ):
-                                self.incorrectCells.append([row,col])
-                                self.mistakes+=1
-                                
+    #checks if all numbers are added, called when all the numbers added are valid and needs to check if game over
     def allGameOver(self):
         for rIdx,row in enumerate(self.grid):
             for cIdx,col in enumerate(row):
@@ -227,10 +199,12 @@ class Sudoku:
         print('congrats you solved sudoku!!')
         return True
     
+    #updates the game with the mouse position
     def update(self,state):
         if(state=='playing'):
             self.mouse_pos= pygame.mouse.get_pos()
 
+    #draws the sudoku grid
     def drawGrid(self,window):
         pygame.draw.rect(window,BLACK,grid_pos,2)
         for r in range(ROWS):
@@ -254,10 +228,12 @@ class Sudoku:
                     thickness=2
                 pygame.draw.line(window, BLACK,(start_x,start_y),(end_x,end_y),thickness)            
 
+    #draws the blue box showing the selected cell
     def drawSelection(self,window,pos):
         margin = 3
         pygame.draw.rect(window,BLUE,(pos[0]*cell_size + grid_pos[0],pos[1]*cell_size+ grid_pos[1],cell_size+margin,cell_size+margin))
 
+    #adds the numbers inside their prober cells
     def drawNumbers(self,window):
         margin = 10
         for rIdx,row in enumerate(self.grid):
@@ -265,20 +241,24 @@ class Sudoku:
                 if col != 0:
                     self.textToScreen(window,str(col),(rIdx*cell_size + grid_pos[0]+ margin,cIdx*cell_size+ grid_pos[1]+ margin))
 
+    #adds text to the GUI
     def textToScreen(self,window,text, pos, colour=BLACK):
         font = self.font.render(text,False,colour)
         window.blit(font,pos)
 
+    #adds a gray shade to the locked cells
     def shadeLockedCells(self,window,lockedCells):
         margin=3
         for cell in lockedCells:
             pygame.draw.rect(window,GRAY,(cell[0]*cell_size + grid_pos[0],cell[1]*cell_size+ grid_pos[1],cell_size+margin,cell_size+margin))
 
+    #adds a red shade to the wrong cells
     def shadeWrongCells(self,window,lockedCells):
         margin=3
         for cell in lockedCells:
             pygame.draw.rect(window,RED,(cell[0]*cell_size + grid_pos[0],cell[1]*cell_size+ grid_pos[1],cell_size+margin,cell_size+margin))
 
+    #main draw function
     def draw(self,state):
         if(state=='playing'):
             self.window.fill(WHITE)
@@ -300,6 +280,7 @@ class Sudoku:
 
             pygame.display.update()
 
+    # proper printing function
     def displayGrid(self):
         for row in self.grid:
             for col in row:
